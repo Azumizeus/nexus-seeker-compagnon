@@ -19,7 +19,8 @@ const PERMISSION_HINT = {
   granted: "Autorisées par le navigateur.",
   denied: "Bloquées par le navigateur : réactive-les dans les réglages du site.",
   default: "Le navigateur te demandera l'autorisation.",
-  unsupported: "Non disponibles sur ce navigateur (sur Android, elles demandent l'application installée).",
+  unsupported:
+    "Non disponibles ici. Sur Android (dont le Seeker), elles exigent une app installable avec service worker, que le projet n'a pas encore : installer la page ne suffit pas.",
 } as const;
 
 /** Which program events raise an alert. Real events, settings stored on this device. */
