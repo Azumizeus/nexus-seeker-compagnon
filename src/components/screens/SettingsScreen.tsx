@@ -2,6 +2,9 @@ import { ExternalLink, Lock, Moon, Sun } from "lucide-react";
 import Badge from "@/components/shared/Badge";
 import LimitsForm from "@/components/admin/LimitsForm";
 import TelegramConnection from "@/components/settings/TelegramConnection";
+import NotificationSettings from "@/components/settings/NotificationSettings";
+import SecuritySettings from "@/components/settings/SecuritySettings";
+import AgentLimitsTable from "@/components/settings/AgentLimitsTable";
 import { SectionTitle } from "@/components/shared/Notices";
 import { useTheme } from "@/hooks/useTheme";
 import { useSupportedWallets } from "@/hooks/useSupportedWallets";
@@ -67,6 +70,25 @@ export default function SettingsScreen() {
       </section>
 
       <section className="card stack">
+        <SectionTitle title="Notifications" />
+        <NotificationSettings />
+      </section>
+
+      <section className="card stack">
+        <SectionTitle title="Sécurité" />
+        <SecuritySettings />
+      </section>
+
+      <section className="card stack">
+        <SectionTitle title="Limites par agent" />
+        <AgentLimitsTable />
+        <div className="stack !gap-2 border-t-[1.5px] border-border pt-4">
+          <p className="label">Plafond global et nombre de wallets par agent (on-chain)</p>
+          <LimitsForm />
+        </div>
+      </section>
+
+      <section className="card stack">
         <SectionTitle title="Personnalisation" />
         <div className="field">
           <p className="label">Thème</p>
@@ -89,10 +111,6 @@ export default function SettingsScreen() {
               Compacte
             </button>
           </div>
-        </div>
-        <div className="stack !gap-2">
-          <p className="label">Wallets agent : plafond global et limite par agent (on-chain)</p>
-          <LimitsForm />
         </div>
       </section>
 

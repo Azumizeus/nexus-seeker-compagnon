@@ -4,10 +4,11 @@
  * hooks can refresh (same tab). A future Supabase sync can hook in here.
  */
 
-export type StoreName = "agents" | "messages" | "activity" | "requests" | "memory" | "sandbox";
+export type StoreName = "agents" | "messages" | "activity" | "requests" | "memory" | "sandbox" | "sessions";
 
 const DB_NAME = "nexus-seeker-compagnon";
-const DB_VERSION = 1;
+/** v2: adds "sessions" (wallet connection log). Stores are created if missing, nothing to migrate. */
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -35,6 +36,7 @@ function openDb(): Promise<IDBDatabase> {
       if (!db.objectStoreNames.contains("sandbox")) {
         db.createObjectStore("sandbox", { keyPath: "key" }).createIndex("agentId", "agentId");
       }
+      if (!db.objectStoreNames.contains("sessions")) db.createObjectStore("sessions", { keyPath: "id" });
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => {
@@ -95,6 +97,12 @@ export async function put<T>(store: StoreName, value: T): Promise<void> {
 export async function remove(store: StoreName, key: IDBValidKey): Promise<void> {
   const db = await openDb();
   await wrap(db.transaction(store, "readwrite").objectStore(store).delete(key));
+  notify(store);
+}
+
+export async function clearStore(store: StoreName): Promise<void> {
+  const db = await openDb();
+  await wrap(db.transaction(store, "readwrite").objectStore(store).clear());
   notify(store);
 }
 

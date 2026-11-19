@@ -9,15 +9,18 @@ import { getAll } from "@/lib/localDb";
 import type { ActivitySeverity, Agent } from "@/lib/models";
 import { formatSol, shortAddress } from "@/lib/utils";
 import { useToast } from "@/hooks/useToast";
+import { useSessionRecorder } from "@/hooks/useSessionLog";
+import { categoryForEvent, getNotificationPrefs, notifySystem, shouldAlert } from "@/lib/notificationPrefs";
 
-type EventSpec = { title: string; severity: ActivitySeverity; toast?: boolean };
+/** Whether an event raises an alert is decided by the notification settings (lib/notificationPrefs). */
+type EventSpec = { title: string; severity: ActivitySeverity };
 
 const EVENT_SPECS: Record<string, EventSpec> = {
   spendRecorded: { title: "Dépense enregistrée", severity: "info" },
-  controlTakenBack: { title: "Contrôle repris", severity: "danger", toast: true },
-  controlReleased: { title: "Autonomie rendue", severity: "success", toast: true },
-  paused: { title: "Programme mis en pause", severity: "danger", toast: true },
-  unpaused: { title: "Programme relancé", severity: "success", toast: true },
+  controlTakenBack: { title: "Contrôle repris", severity: "danger" },
+  controlReleased: { title: "Autonomie rendue", severity: "success" },
+  paused: { title: "Programme mis en pause", severity: "danger" },
+  unpaused: { title: "Programme relancé", severity: "success" },
   walletModeUpdated: { title: "Mode de wallet modifié", severity: "info" },
   walletSpendCapUpdated: { title: "Plafond de wallet modifié", severity: "info" },
   agentWalletRegistered: { title: "Wallet agent enregistré", severity: "success" },
@@ -27,9 +30,9 @@ const EVENT_SPECS: Record<string, EventSpec> = {
   globalSpentReset: { title: "Compteur global remis à zéro", severity: "info" },
   globalSpendCapUpdated: { title: "Plafond global modifié", severity: "info" },
   perAgentLimitUpdated: { title: "Limite par agent modifiée", severity: "info" },
-  guardianUpdated: { title: "Guardian modifié", severity: "alert", toast: true },
-  authorityProposed: { title: "Transfert d'authority proposé", severity: "alert", toast: true },
-  authorityAccepted: { title: "Authority transférée", severity: "alert", toast: true },
+  guardianUpdated: { title: "Guardian modifié", severity: "alert" },
+  authorityProposed: { title: "Transfert d'authority proposé", severity: "alert" },
+  authorityAccepted: { title: "Authority transférée", severity: "alert" },
 };
 
 function modeKey(value: unknown) {
@@ -44,7 +47,7 @@ function toNumber(value: unknown) {
 
 export default function NexusProvider({ children }: { children: ReactNode }) {
   const { connection } = useConnection();
-  const { connected, publicKey } = useWallet();
+  const { connected, publicKey, wallet } = useWallet();
   const anchorWallet = useAnchorWallet();
   const { toast } = useToast();
 
@@ -126,21 +129,24 @@ export default function NexusProvider({ children }: { children: ReactNode }) {
           let title = spec.title;
           let severity = spec.severity;
           let detail: string | undefined;
-          let showToast = spec.toast ?? false;
+          let autonomous = false;
 
           if (name === "spendRecorded") {
-            const autonomous = modeKey(event.effectiveMode) === "agentAuthorized";
+            autonomous = modeKey(event.effectiveMode) === "agentAuthorized";
             title = autonomous ? "Signature autonome" : "Dépense validée";
             severity = autonomous ? "alert" : "info";
             detail = `${agentLabel ?? "Agent"} · ${formatSol(toNumber(event.amountLamports))}`;
-            showToast = autonomous;
           } else if (name === "controlTakenBack" || name === "controlReleased") {
             detail = agentLabel ? `Agent : ${agentLabel}` : "Tous les wallets agent";
           } else if (event.wallet) {
             detail = `Wallet ${shortAddress(String(event.wallet))}`;
           }
 
-          if (showToast) toast({ tone: severity === "success" ? "success" : severity === "danger" ? "danger" : "alert", title, description: detail });
+          const prefs = getNotificationPrefs();
+          if (shouldAlert(categoryForEvent(name, autonomous), prefs)) {
+            toast({ tone: severity === "success" ? "success" : severity === "danger" ? "danger" : severity === "info" ? "info" : "alert", title, description: detail });
+            if (prefs.system) notifySystem(title, detail);
+          }
 
           // Give our own transaction time to land in the journal first.
           await new Promise((r) => setTimeout(r, 1500));
@@ -156,6 +162,7 @@ export default function NexusProvider({ children }: { children: ReactNode }) {
   }, [client, loadConfig, bumpChainTick, toast]);
 
   const walletAddress = publicKey?.toBase58() ?? null;
+  useSessionRecorder(walletAddress, wallet?.adapter.name ?? null);
 
   const role = useMemo<Role>(
     () => ({
