@@ -129,13 +129,25 @@ export interface ResilientConnectionOptions {
   minRequestIntervalMs?: number;
 }
 
+/**
+ * Spacing only protects the shared public endpoint.
+ *
+ * With a configured provider (own key, own quota) the extra latency buys
+ * nothing, so it is off; without one, requests are spaced to stay under the
+ * public devnet limit.
+ */
+export function resolveRequestSpacing(endpoints: readonly string[]): number {
+  const hasConfiguredEndpoint = endpoints.some((endpoint) => endpoint !== PUBLIC_DEVNET_RPC);
+  return hasConfiguredEndpoint ? 0 : 100;
+}
+
 export function createResilientConnection(
   endpoints: readonly string[] = resolveRpcEndpoints(),
   config: ConnectionConfig = {},
   options: ResilientConnectionOptions = {},
 ): Connection {
-  const { minRequestIntervalMs = 100 } = options;
   const list = endpoints.length > 0 ? [...endpoints] : [PUBLIC_DEVNET_RPC];
+  const { minRequestIntervalMs = resolveRequestSpacing(list) } = options;
   const connection = new Connection(list[0], {
     commitment: "confirmed",
     // Our failover owns retries; web3.js's own loop would only add 4s stalls.
