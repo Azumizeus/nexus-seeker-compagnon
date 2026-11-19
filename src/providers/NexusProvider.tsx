@@ -48,6 +48,11 @@ export default function NexusProvider({ children }: { children: ReactNode }) {
   const anchorWallet = useAnchorWallet();
   const { toast } = useToast();
 
+  /*
+   * `connection` is stable (module-level config in SolanaProvider) and
+   * `useAnchorWallet` is memoised by the adapter, so the client — and the
+   * websocket subscriptions bound to it — is only rebuilt on connect/disconnect.
+   */
   const client = useMemo(() => new NexusAccessClient(connection, anchorWallet ?? null), [connection, anchorWallet]);
 
   const [config, setConfig] = useState<ConfigState | null>(null);
@@ -57,16 +62,21 @@ export default function NexusProvider({ children }: { children: ReactNode }) {
   const [chainTick, setChainTick] = useState(0);
   const [walletPickerOpen, setWalletPickerOpen] = useState(false);
 
-  const loadConfig = useCallback(async () => {
-    const result = await client.fetchConfig();
+  const applyConfigResult = useCallback((result: Awaited<ReturnType<NexusAccessClient["fetchConfig"]>>) => {
     if (result.success && result.data) {
-      setConfig(result.data);
+      const next = result.data;
+      // Keep the previous object when nothing changed: no re-render of every consumer.
+      setConfig((prev) => (prev && JSON.stringify(prev) === JSON.stringify(next) ? prev : next));
       setConfigError(null);
     } else {
       setConfigError(result.error ?? "Lecture de la Config impossible");
     }
     setConfigLoading(false);
-  }, [client]);
+  }, []);
+
+  const loadConfig = useCallback(async () => {
+    applyConfigResult(await client.fetchConfig());
+  }, [client, applyConfigResult]);
 
   const refreshConfig = useCallback(async () => {
     setConfigLoading(true);
@@ -77,8 +87,14 @@ export default function NexusProvider({ children }: { children: ReactNode }) {
 
   /* Initial Config load. */
   useEffect(() => {
-    void loadConfig();
-  }, [loadConfig]);
+    let alive = true;
+    client.fetchConfig().then((result) => {
+      if (alive) applyConfigResult(result);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [client, applyConfigResult]);
 
   /* Network check: the RPC must be Solana devnet. */
   useEffect(() => {

@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { subscribe, type StoreName } from "@/lib/localDb";
 
 /**
  * Loads data from an IndexedDB store and reloads it whenever that store changes.
  * `loader` must be stable (wrap it in useCallback).
+ * Identical reloads don't trigger a re-render.
  */
 export function useLocalStore<T>(store: StoreName, loader: () => Promise<T>, initial: T) {
   const [data, setData] = useState<T>(initial);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const lastJson = useRef<string | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -16,7 +18,11 @@ export function useLocalStore<T>(store: StoreName, loader: () => Promise<T>, ini
       loader()
         .then((d) => {
           if (!alive) return;
-          setData(d);
+          const json = JSON.stringify(d);
+          if (json !== lastJson.current) {
+            lastJson.current = json;
+            setData(d);
+          }
           setError(null);
           setLoading(false);
         })
