@@ -1,4 +1,4 @@
 All program id declarations are synced.
-    Finished `release` profile [optimized] target(s) in 0.71s
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.42s
+    Finished `release` profile [optimized] target(s) in 0.64s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.32s
      Running unittests src/lib.rs (/mnt/contracts/target/debug/deps/workspace-8fdbefc5829c5623)
