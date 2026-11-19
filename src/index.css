@@ -1,3 +1,224 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Nexus Seeker Compagnon — design tokens.
+ * All values are HSL triplets consumed as hsl(var(--token) / <alpha>) by Tailwind.
+ * Warm cream foundation, Solana green primary, Solana violet secondary, warm orange accent.
+ */
+@layer base {
+  :root {
+    --font-display: "Bricolage Grotesque", ui-sans-serif, sans-serif;
+    --font-body: "DM Sans", ui-sans-serif, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+    --background: 40 52% 95%;
+    --surface: 42 70% 99%;
+    --surface-sunken: 38 40% 91%;
+    --foreground: 24 28% 13%;
+    --muted-foreground: 26 14% 38%;
+    --border: 34 30% 83%;
+    --border-strong: 30 22% 70%;
+
+    --primary: 155 89% 51%;
+    --primary-ink: 158 85% 22%;
+    --primary-soft: 152 70% 88%;
+    --primary-foreground: 158 60% 10%;
+
+    --secondary: 267 100% 64%;
+    --secondary-ink: 267 70% 42%;
+    --secondary-soft: 266 90% 94%;
+    --secondary-foreground: 0 0% 100%;
+
+    --accent: 22 90% 56%;
+    --accent-ink: 20 80% 36%;
+    --accent-soft: 28 95% 91%;
+
+    --danger: 2 76% 49%;
+    --danger-ink: 2 70% 38%;
+    --danger-soft: 4 85% 94%;
+    --danger-foreground: 0 0% 100%;
+
+    --warning: 40 95% 50%;
+    --warning-soft: 44 95% 89%;
+    --warning-ink: 32 80% 28%;
+
+    --agent-0: 155 70% 40%;
+    --agent-1: 267 80% 60%;
+    --agent-2: 22 88% 54%;
+    --agent-3: 199 80% 45%;
+    --agent-4: 340 72% 55%;
+    --agent-5: 46 90% 46%;
+    --agent-6: 180 55% 36%;
+
+    --ring: 267 100% 64%;
+    --radius: 18px;
+    --tap: 44px;
+    --card-pad: 1.25rem;
+    --stack-gap: 1rem;
+
+    --shadow-card: 0 1px 0 hsl(30 40% 60% / 0.12), 0 6px 18px -8px hsl(28 45% 35% / 0.18);
+    --shadow-pop: 0 2px 0 hsl(24 28% 13% / 0.9);
+    --shadow-float: 0 18px 40px -16px hsl(28 45% 25% / 0.35);
+    --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .dark {
+    --background: 26 20% 9%;
+    --surface: 26 18% 13%;
+    --surface-sunken: 26 20% 7%;
+    --foreground: 38 45% 92%;
+    --muted-foreground: 32 14% 64%;
+    --border: 28 14% 22%;
+    --border-strong: 28 12% 34%;
+
+    --primary-ink: 155 80% 58%;
+    --primary-soft: 158 45% 16%;
+    --secondary-ink: 267 100% 78%;
+    --secondary-soft: 267 35% 20%;
+    --accent-ink: 26 95% 66%;
+    --accent-soft: 22 40% 18%;
+    --danger: 2 80% 56%;
+    --danger-ink: 4 90% 72%;
+    --danger-soft: 2 40% 17%;
+    --warning-soft: 38 45% 16%;
+    --warning-ink: 42 95% 66%;
+
+    --shadow-card: 0 1px 0 hsl(0 0% 100% / 0.04), 0 10px 24px -12px hsl(0 0% 0% / 0.6);
+    --shadow-pop: 0 2px 0 hsl(0 0% 0% / 0.8);
+    --shadow-float: 0 18px 40px -16px hsl(0 0% 0% / 0.7);
+  }
+
+  html[data-density="compact"] {
+    --card-pad: 0.875rem;
+    --stack-gap: 0.625rem;
+  }
+
+  * {
+    border-color: hsl(var(--border));
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: var(--font-body);
+    font-feature-settings: "ss01";
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(hsl(var(--border) / 0.55) 1px, transparent 1px);
+    background-size: 22px 22px;
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .card {
+    background-color: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: var(--card-pad);
+  }
+
+  .stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--stack-gap);
+  }
+
+  .field {
+    width: 100%;
+    min-height: var(--tap);
+    border-radius: 14px;
+    border: 1.5px solid hsl(var(--border-strong));
+    background-color: hsl(var(--surface));
+    padding: 0.625rem 0.875rem;
+    font-size: 1rem;
+    color: hsl(var(--foreground));
+    transition: border-color 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
+  }
+  .field::placeholder {
+    color: hsl(var(--muted-foreground) / 0.8);
+  }
+  .field:focus {
+    outline: none;
+    border-color: hsl(var(--secondary));
+    box-shadow: 0 0 0 3px hsl(var(--secondary) / 0.18);
+  }
+  .field:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+}
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scan {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes blink-dot {
+  0%, 80%, 100% { opacity: 0.25; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-3px); }
+}
+
+.animate-rise {
+  animation: rise-in 0.45s var(--ease-out) both;
+}
+.animate-scan {
+  animation: scan 6s linear infinite;
+}
+.typing-dot {
+  animation: blink-dot 1.2s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise, .animate-scan, .typing-dot {
+    animation: none;
+  }
+}
