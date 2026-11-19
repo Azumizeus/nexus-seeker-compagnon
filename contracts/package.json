@@ -7,14 +7,9 @@
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
-<<<<<<< HEAD
-    "test": "ts-mocha tests/test.ts",
-    "test:litesvm": "ts-mocha tests/test.ts"
-=======
     "test": "ts-mocha tests/workspace.ts",
     "test:litesvm": "ts-mocha tests/workspace.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
->>>>>>> e69dc551b4db7d093061b619d06c39bbc2712d2d
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.31.1",
