@@ -19,7 +19,7 @@ const PERMISSION_HINT = {
   granted: "Autorisées par le navigateur.",
   denied: "Bloquées par le navigateur : réactive-les dans les réglages du site.",
   default: "Le navigateur te demandera l'autorisation.",
-  unsupported: "Non disponibles sur ce navigateur.",
+  unsupported: "Non disponibles sur ce navigateur (sur Android, elles demandent l'application installée).",
 } as const;
 
 /** Which program events raise an alert. Real events, settings stored on this device. */
@@ -57,11 +57,13 @@ export default function NotificationSettings() {
         ))}
       </ul>
 
+      <p className="label pt-1">Canal supplémentaire</p>
       <label htmlFor="notif-system" className="flex min-h-tap cursor-pointer items-center gap-3 rounded-xl bg-surface-sunken px-3 py-2">
         <span className="min-w-0 flex-1">
           <span className="block font-semibold">Notifications du système</span>
           <span className="block text-xs text-muted-foreground">
-            Quand l'onglet est en arrière-plan. {PERMISSION_HINT[permission]}
+            En plus des alertes dans l'app, quand l'onglet est en arrière-plan. Les couper ne coupe ni les alertes toujours actives ni le
+            journal. {PERMISSION_HINT[permission]}
           </span>
         </span>
         <Switch

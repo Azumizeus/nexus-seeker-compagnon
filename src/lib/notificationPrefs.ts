@@ -52,6 +52,21 @@ export function shouldAlert(category: NotificationCategory, prefs: NotificationP
   return category === "spends" ? prefs.spends : prefs.registry;
 }
 
+export interface AlertChannels {
+  toast: boolean;
+  system: boolean;
+}
+
+/**
+ * Which channels fire for an event. The in-app toast depends only on the
+ * category (locked ones always fire). The system channel is purely additive:
+ * turning it off never silences a toast, and nothing here touches the journal.
+ */
+export function alertChannels(category: NotificationCategory, prefs: NotificationPrefs): AlertChannels {
+  const toast = shouldAlert(category, prefs);
+  return { toast, system: toast && prefs.system };
+}
+
 /* ------------------------------ store ------------------------------ */
 
 const KEY = "nexus.notifications";
@@ -95,15 +110,45 @@ export function subscribeNotificationPrefs(listener: () => void) {
 
 export type SystemPermission = NotificationPermission | "unsupported";
 
-export function systemPermission(): SystemPermission {
-  return typeof Notification === "undefined" ? "unsupported" : Notification.permission;
+/** Android Chrome forbids `new Notification()` (TypeError): it only allows them through a service worker. */
+function needsServiceWorker() {
+  return typeof navigator !== "undefined" && /Android/.test(navigator.userAgent);
 }
 
-/** Shows a browser notification, only when the tab is hidden (the toast covers the visible case). */
+/** Guards every access: `Notification` doesn't exist in jsdom nor in some browsers. */
+export function systemPermission(): SystemPermission {
+  if (typeof Notification === "undefined") return "unsupported";
+  if (needsServiceWorker() && !navigator.serviceWorker?.controller) return "unsupported";
+  return Notification.permission;
+}
+
+/**
+ * Asks the browser for permission. MUST be called synchronously from a click
+ * handler — Chrome and Safari ignore or deny requests made outside a user
+ * gesture (never on mount, never in a useEffect). Handles the legacy
+ * callback-only Safari signature.
+ */
+export function requestSystemPermission(): Promise<SystemPermission> {
+  if (systemPermission() === "unsupported") return Promise.resolve("unsupported");
+  if (Notification.permission !== "default") return Promise.resolve(Notification.permission);
+  return new Promise((resolve) => {
+    const pending = Notification.requestPermission(resolve);
+    if (pending) void pending.then(resolve, () => resolve(Notification.permission));
+  });
+}
+
+/** Shows a browser notification, only when the tab is hidden (the toast covers the visible case). Never throws. */
 export function notifySystem(title: string, body?: string) {
   if (systemPermission() !== "granted" || typeof document === "undefined" || !document.hidden) return;
+  const options: NotificationOptions = { body, icon: "/icon.svg", tag: `nexus-${title}` };
+  if (needsServiceWorker()) {
+    void navigator.serviceWorker.ready
+      .then((registration) => registration.showNotification(title, options))
+      .catch((error: unknown) => console.error("[notifications]", error));
+    return;
+  }
   try {
-    new Notification(title, { body, icon: "/icon.svg", tag: `nexus-${title}` });
+    new Notification(title, options);
   } catch (error) {
     console.error("[notifications]", error);
   }

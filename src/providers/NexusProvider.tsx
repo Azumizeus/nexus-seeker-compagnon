@@ -10,7 +10,7 @@ import type { ActivitySeverity, Agent } from "@/lib/models";
 import { formatSol, shortAddress } from "@/lib/utils";
 import { useToast } from "@/hooks/useToast";
 import { useSessionRecorder } from "@/hooks/useSessionLog";
-import { categoryForEvent, getNotificationPrefs, notifySystem, shouldAlert } from "@/lib/notificationPrefs";
+import { alertChannels, categoryForEvent, getNotificationPrefs, notifySystem } from "@/lib/notificationPrefs";
 
 /** Whether an event raises an alert is decided by the notification settings (lib/notificationPrefs). */
 type EventSpec = { title: string; severity: ActivitySeverity };
@@ -142,11 +142,12 @@ export default function NexusProvider({ children }: { children: ReactNode }) {
             detail = `Wallet ${shortAddress(String(event.wallet))}`;
           }
 
-          const prefs = getNotificationPrefs();
-          if (shouldAlert(categoryForEvent(name, autonomous), prefs)) {
+          // The journal entry above is always written; channels only decide how the user is alerted.
+          const channels = alertChannels(categoryForEvent(name, autonomous), getNotificationPrefs());
+          if (channels.toast) {
             toast({ tone: severity === "success" ? "success" : severity === "danger" ? "danger" : severity === "info" ? "info" : "alert", title, description: detail });
-            if (prefs.system) notifySystem(title, detail);
           }
+          if (channels.system) notifySystem(title, detail);
 
           // Give our own transaction time to land in the journal first.
           await new Promise((r) => setTimeout(r, 1500));
