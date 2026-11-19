@@ -30,16 +30,48 @@ const SYSTEM_PROGRAM = address("11111111111111111111111111111111");
 const SOL = 1_000_000_000;
 const addressCodec = getAddressCodec();
 
+type Signer = Awaited<ReturnType<typeof generateKeyPairSigner>>;
+type Instruction = Parameters<typeof appendTransactionMessageInstruction>[0];
+type AccountEntry = { address: Address; role: AccountRole; signer?: Signer };
+type RawAccount = { data?: Uint8Array; exists?: boolean };
+type DecodedEvent = { name: string; data: Record<string, Record<string, object>> };
+
+/** Champs du compte Config lus par les tests (décodés depuis l'IDL). */
+interface DecodedConfig {
+  authority: unknown;
+  guardian: unknown;
+  pending_authority: unknown;
+  paused: boolean;
+  max_wallets_per_agent: number;
+  total_wallets: number;
+  shared_wallets: number;
+  wallets_per_agent: number[];
+  global_spend_cap_lamports: { toString(): string };
+  global_spent_lamports: { toString(): string };
+  global_override: boolean;
+  agent_override_mask: number;
+}
+
+/** Champs du compte AgentWallet lus par les tests. */
+interface DecodedAgentWallet {
+  agent_id: number;
+  is_shared: boolean;
+  assigned_agents_mask: number;
+  wallet_pubkey: unknown;
+  mode: Record<string, unknown>;
+  spent_lamports: { toString(): string };
+}
+
 describe("nexus_access", () => {
   let svm: LiteSVM;
-  let authority: any;
-  let guardian: any;
-  let stranger: any;
+  let authority: Signer;
+  let guardian: Signer;
+  let stranger: Signer;
   let configPDA: Address;
   let programDataPDA: Address;
 
   function setRawAccount(addr: Address, data: Uint8Array, owner: Address, executable: boolean) {
-    const acct: any = {
+    const acct = {
       address: addr,
       data,
       executable,
@@ -49,12 +81,12 @@ describe("nexus_access", () => {
       space: BigInt(data.length),
       rentEpoch: 0n,
     };
-    const fn: any = (svm as any).setAccount;
+    const fn = (svm as unknown as { setAccount: (...args: unknown[]) => void }).setAccount;
     if (fn.length >= 2) fn.call(svm, addr, acct);
     else fn.call(svm, acct);
   }
 
-  async function sendIx(ix: any, feePayerSigner: any) {
+  async function sendIx(ix: Instruction, feePayerSigner: Signer) {
     const msg = appendTransactionMessageInstruction(
       ix,
       setTransactionMessageFeePayerSigner(feePayerSigner, createTransactionMessage({ version: 0 }))
@@ -65,11 +97,11 @@ describe("nexus_access", () => {
     if (res instanceof FailedTransactionMetadata) {
       throw new Error(res.meta().prettyLogs());
     }
-    (svm as any).expireBlockhash?.();
+    (svm as unknown as { expireBlockhash?: () => void }).expireBlockhash?.();
     return res;
   }
 
-  async function expectFailure(ix: any, feePayerSigner: any, includes: string) {
+  async function expectFailure(ix: Instruction, feePayerSigner: Signer, includes: string) {
     const msg = appendTransactionMessageInstruction(
       ix,
       setTransactionMessageFeePayerSigner(feePayerSigner, createTransactionMessage({ version: 0 }))
@@ -83,32 +115,37 @@ describe("nexus_access", () => {
   }
 
   function fetchAccount<T>(name: string, addr: Address): T {
-    const acc = svm.getAccount(addr);
-    if (!acc || ("exists" in acc && !acc.exists)) {
+    const acc = svm.getAccount(addr) as unknown as RawAccount | null;
+    if (!acc || acc.exists === false) {
       throw new Error(`Missing account ${name} at ${addr}`);
     }
-    return coder.accounts.decode(name, Buffer.from((acc as any).data)) as T;
+    return coder.accounts.decode(name, Buffer.from(acc.data ?? new Uint8Array())) as T;
   }
 
   function accountExists(addr: Address): boolean {
-    const acc: any = svm.getAccount(addr);
+    const acc = svm.getAccount(addr) as unknown as RawAccount | null;
     if (!acc) return false;
-    if ("exists" in acc && !acc.exists) return false;
-    return acc.data && acc.data.length > 0;
+    if (acc.exists === false) return false;
+    return Boolean(acc.data && acc.data.length > 0);
   }
 
-  function toAddressString(value: any): string {
+  function toAddressString(value: unknown): string {
     if (typeof value === "string") return value;
     if (value instanceof Uint8Array) return addressCodec.decode(value);
-    if (value && typeof value.toBase58 === "function") return value.toBase58();
+    if (value && typeof value === "object" && "toBase58" in value) {
+      const candidate = value as { toBase58?: unknown };
+      if (typeof candidate.toBase58 === "function") {
+        return (candidate.toBase58 as () => string).call(value);
+      }
+    }
     throw new Error("Unable to decode address");
   }
 
-  function decodeEvents(res: any): any[] {
-    const out: any[] = [];
+  function decodeEvents(res: { logs(): string[] }): DecodedEvent[] {
+    const out: DecodedEvent[] = [];
     for (const line of res.logs() as string[]) {
       if (line.startsWith("Program data: ")) {
-        const ev = coder.events.decode(line.slice("Program data: ".length));
+        const ev = coder.events.decode(line.slice("Program data: ".length)) as DecodedEvent | null;
         if (ev) out.push(ev);
       }
     }
@@ -117,11 +154,15 @@ describe("nexus_access", () => {
 
   const ro = (a: Address) => ({ address: a, role: AccountRole.READONLY });
   const w = (a: Address) => ({ address: a, role: AccountRole.WRITABLE });
-  const s = (signer: any) => ({ address: signer.address, role: AccountRole.READONLY_SIGNER, signer });
-  const ws = (signer: any) => ({ address: signer.address, role: AccountRole.WRITABLE_SIGNER, signer });
+  const s = (signer: Signer) => ({ address: signer.address, role: AccountRole.READONLY_SIGNER, signer });
+  const ws = (signer: Signer) => ({ address: signer.address, role: AccountRole.WRITABLE_SIGNER, signer });
 
-  function ix(name: string, args: any, accounts: any[]) {
-    return { programAddress, accounts, data: coder.instruction.encode(name, args) };
+  function ix(name: string, args: Record<string, unknown>, accounts: AccountEntry[]): Instruction {
+    return {
+      programAddress,
+      accounts,
+      data: coder.instruction.encode(name, args),
+    } as Instruction;
   }
 
   async function agentWalletPDA(agentId: number, idx: number) {
@@ -146,14 +187,14 @@ describe("nexus_access", () => {
     return pda;
   }
 
-  const adminIx = (name: string, args: any, signer = authority) =>
+  const adminIx = (name: string, args: Record<string, unknown>, signer: Signer = authority) =>
     ix(name, args, [w(configPDA), s(signer)]);
-  const guardIx = (name: string, args: any, signer: any) =>
+  const guardIx = (name: string, args: Record<string, unknown>, signer: Signer) =>
     ix(name, args, [w(configPDA), s(signer)]);
-  const walletIx = (name: string, args: any, wallet: Address, signer = authority) =>
+  const walletIx = (name: string, args: Record<string, unknown>, wallet: Address, signer: Signer = authority) =>
     ix(name, args, [w(configPDA), w(wallet), s(signer)]);
 
-  async function registerIndividual(agentId: number, idx: number, walletPk: Address, cap: number, signer = authority) {
+  async function registerIndividual(agentId: number, idx: number, walletPk: Address, cap: number, signer: Signer = authority) {
     const aw = await agentWalletPDA(agentId, idx);
     const lk = await lookupPDA(walletPk);
     return {
@@ -191,7 +232,7 @@ describe("nexus_access", () => {
     };
   }
 
-  const initIx = (signer: any, guardianAddr: Address) =>
+  const initIx = (signer: Signer, guardianAddr: Address) =>
     ix("initialize_config", { guardian: new PublicKey(guardianAddr) }, [
       w(configPDA),
       ws(signer),
@@ -259,7 +300,7 @@ describe("nexus_access", () => {
 
   it("initializes config with defaults", async () => {
     await sendIx(initIx(authority, guardian.address), authority);
-    const c: any = fetchAccount("Config", configPDA);
+    const c = fetchAccount<DecodedConfig>("Config", configPDA);
     expect(toAddressString(c.authority)).to.equal(authority.address);
     expect(toAddressString(c.guardian)).to.equal(guardian.address);
     expect(c.pending_authority).to.equal(null);
@@ -286,7 +327,7 @@ describe("nexus_access", () => {
   it("validates per-agent limit values", async () => {
     await expectFailure(adminIx("set_max_wallets_per_agent", { n: 3 }), authority, "InvalidPerAgentLimit");
     await sendIx(adminIx("set_max_wallets_per_agent", { n: 10 }), authority);
-    const c: any = fetchAccount("Config", configPDA);
+    const c = fetchAccount<DecodedConfig>("Config", configPDA);
     expect(c.max_wallets_per_agent).to.equal(10);
     await sendIx(adminIx("set_max_wallets_per_agent", { n: 5 }), authority);
   });
@@ -296,14 +337,14 @@ describe("nexus_access", () => {
     const r = await registerIndividual(0, 0, pk, 1 * SOL);
     const res = await sendIx(r.ix, authority);
     wallet0 = r.aw;
-    const aw: any = fetchAccount("AgentWallet", r.aw);
+    const aw = fetchAccount<DecodedAgentWallet>("AgentWallet", r.aw);
     expect(aw.agent_id).to.equal(0);
     expect(aw.is_shared).to.equal(false);
     expect(Object.keys(aw.mode)[0].toLowerCase()).to.equal("humanvalidation");
     expect(toAddressString(aw.wallet_pubkey)).to.equal(pk);
-    const lk: any = fetchAccount("WalletLookup", r.lk);
+    const lk = fetchAccount<{ agent_wallet: unknown }>("WalletLookup", r.lk);
     expect(toAddressString(lk.agent_wallet)).to.equal(r.aw);
-    const c: any = fetchAccount("Config", configPDA);
+    const c = fetchAccount<DecodedConfig>("Config", configPDA);
     expect(c.total_wallets).to.equal(1);
     expect(c.wallets_per_agent[0]).to.equal(1);
     const evs = decodeEvents(res);
@@ -311,7 +352,7 @@ describe("nexus_access", () => {
   });
 
   it("rejects duplicate wallet pubkey via lookup", async () => {
-    const aw: any = fetchAccount("AgentWallet", wallet0);
+    const aw = fetchAccount<DecodedAgentWallet>("AgentWallet", wallet0);
     const pk = toAddressString(aw.wallet_pubkey) as Address;
     const r = await registerIndividual(0, 1, pk, 1 * SOL);
     await expectFailure(r.ix, authority, "already in use");
@@ -347,11 +388,11 @@ describe("nexus_access", () => {
     const r = await registerShared(0, (await generateKeyPairSigner()).address, 0b011, SOL);
     await sendIx(r.ix, authority);
     shared0 = r.aw;
-    const aw: any = fetchAccount("AgentWallet", r.aw);
+    const aw = fetchAccount<DecodedAgentWallet>("AgentWallet", r.aw);
     expect(aw.agent_id).to.equal(255);
     expect(aw.is_shared).to.equal(true);
     expect(aw.assigned_agents_mask).to.equal(3);
-    const c: any = fetchAccount("Config", configPDA);
+    const c = fetchAccount<DecodedConfig>("Config", configPDA);
     expect(c.shared_wallets).to.equal(1);
   });
 
@@ -359,7 +400,7 @@ describe("nexus_access", () => {
     await expectFailure(walletIx("assign_shared_wallet", { agents_mask: 1 }, wallet0), authority, "NotSharedWallet");
     await expectFailure(walletIx("assign_shared_wallet", { agents_mask: 0xff }, shared0), authority, "InvalidAgentMask");
     await sendIx(walletIx("assign_shared_wallet", { agents_mask: 0b100 }, shared0), authority);
-    const aw: any = fetchAccount("AgentWallet", shared0);
+    const aw = fetchAccount<DecodedAgentWallet>("AgentWallet", shared0);
     expect(aw.assigned_agents_mask).to.equal(4);
   });
 
@@ -367,7 +408,7 @@ describe("nexus_access", () => {
     await sendIx(walletIx("set_wallet_mode", { mode: { AgentAuthorized: {} } }, wallet0), authority);
     await expectFailure(walletIx("set_wallet_spend_cap", { new_cap_lamports: new BN(3 * SOL) }, wallet0), authority, "SpendCapExceedsGlobal");
     await sendIx(walletIx("set_wallet_spend_cap", { new_cap_lamports: new BN(SOL) }, wallet0), authority);
-    const aw: any = fetchAccount("AgentWallet", wallet0);
+    const aw = fetchAccount<DecodedAgentWallet>("AgentWallet", wallet0);
     expect(Object.keys(aw.mode)[0].toLowerCase()).to.equal("agentauthorized");
   });
 
@@ -379,29 +420,29 @@ describe("nexus_access", () => {
     await sendIx(guardIx("take_back_control_for_agent", { agent_id: 0 }, guardian), guardian);
     evs = decodeEvents(await sendIx(ix("get_effective_mode", {}, [ro(configPDA), ro(wallet0)]), stranger));
     expect(Object.keys(evs[0].data.effective_mode)[0].toLowerCase()).to.equal("humanvalidation");
-    const aw: any = fetchAccount("AgentWallet", wallet0);
+    const aw = fetchAccount<DecodedAgentWallet>("AgentWallet", wallet0);
     expect(Object.keys(aw.mode)[0].toLowerCase()).to.equal("agentauthorized");
 
     await expectFailure(adminIx("release_control_for_agent", { agent_id: 0 }, guardian), guardian, "Unauthorized");
     await sendIx(adminIx("release_control_for_agent", { agent_id: 0 }), authority);
-    const c: any = fetchAccount("Config", configPDA);
+    const c = fetchAccount<DecodedConfig>("Config", configPDA);
     expect(c.agent_override_mask).to.equal(0);
   });
 
   it("global take_back_control and release", async () => {
     await expectFailure(guardIx("take_back_control", {}, stranger), stranger, "Unauthorized");
     await sendIx(guardIx("take_back_control", {}, guardian), guardian);
-    expect((fetchAccount("Config", configPDA) as any).global_override).to.equal(true);
+    expect(fetchAccount<DecodedConfig>("Config", configPDA).global_override).to.equal(true);
     await sendIx(adminIx("release_control", {}), authority);
-    expect((fetchAccount("Config", configPDA) as any).global_override).to.equal(false);
+    expect(fetchAccount<DecodedConfig>("Config", configPDA).global_override).to.equal(false);
     await expectFailure(guardIx("take_back_control_for_agent", { agent_id: 7 }, guardian), guardian, "InvalidAgentId");
   });
 
   it("records spend and enforces wallet cap", async () => {
     const res = await sendIx(walletIx("record_spend", { amount_lamports: new BN(SOL / 2) }, wallet0), authority);
-    const aw: any = fetchAccount("AgentWallet", wallet0);
+    const aw = fetchAccount<DecodedAgentWallet>("AgentWallet", wallet0);
     expect(aw.spent_lamports.toString()).to.equal(String(SOL / 2));
-    const c: any = fetchAccount("Config", configPDA);
+    const c = fetchAccount<DecodedConfig>("Config", configPDA);
     expect(c.global_spent_lamports.toString()).to.equal(String(SOL / 2));
     expect(decodeEvents(res).some((e) => e.name === "SpendRecorded")).to.equal(true);
     await expectFailure(walletIx("record_spend", { amount_lamports: new BN(SOL) }, wallet0), authority, "WalletSpendCapExceeded");
@@ -417,11 +458,11 @@ describe("nexus_access", () => {
   it("resets wallet and global spent", async () => {
     await sendIx(walletIx("record_spend", { amount_lamports: new BN(0.1 * SOL) }, shared0), authority);
     await sendIx(walletIx("reset_wallet_spent", {}, wallet0), authority);
-    expect((fetchAccount("AgentWallet", wallet0) as any).spent_lamports.toString()).to.equal("0");
-    expect((fetchAccount("Config", configPDA) as any).global_spent_lamports.toString()).to.equal(String(0.1 * SOL));
+    expect(fetchAccount<DecodedAgentWallet>("AgentWallet", wallet0).spent_lamports.toString()).to.equal("0");
+    expect(fetchAccount<DecodedConfig>("Config", configPDA).global_spent_lamports.toString()).to.equal(String(0.1 * SOL));
     await sendIx(adminIx("reset_global_spent", {}), authority);
-    expect((fetchAccount("Config", configPDA) as any).global_spent_lamports.toString()).to.equal("0");
-    expect((fetchAccount("AgentWallet", shared0) as any).spent_lamports.toString()).to.equal(String(0.1 * SOL));
+    expect(fetchAccount<DecodedConfig>("Config", configPDA).global_spent_lamports.toString()).to.equal("0");
+    expect(fetchAccount<DecodedAgentWallet>("AgentWallet", shared0).spent_lamports.toString()).to.equal(String(0.1 * SOL));
   });
 
   it("pause blocks registration and spend; revoke still works", async () => {
@@ -431,26 +472,26 @@ describe("nexus_access", () => {
     await expectFailure(r.ix, authority, "Paused");
     await expectFailure(walletIx("record_spend", { amount_lamports: new BN(1) }, wallet0), authority, "Paused");
 
-    const before: any = fetchAccount("Config", configPDA);
-    const aw: any = fetchAccount("AgentWallet", shared0);
+    const before = fetchAccount<DecodedConfig>("Config", configPDA);
+    const aw = fetchAccount<DecodedAgentWallet>("AgentWallet", shared0);
     const lk = await lookupPDA(toAddressString(aw.wallet_pubkey) as Address);
     await sendIx(ix("revoke_agent_wallet", {}, [w(configPDA), w(shared0), w(lk), ws(authority)]), authority);
     expect(accountExists(shared0)).to.equal(false);
     expect(accountExists(lk)).to.equal(false);
-    const after: any = fetchAccount("Config", configPDA);
+    const after = fetchAccount<DecodedConfig>("Config", configPDA);
     expect(after.total_wallets).to.equal(before.total_wallets - 1);
     expect(after.shared_wallets).to.equal(before.shared_wallets - 1);
 
     await expectFailure(adminIx("unpause", {}, guardian), guardian, "Unauthorized");
     await sendIx(adminIx("unpause", {}), authority);
-    expect((fetchAccount("Config", configPDA) as any).paused).to.equal(false);
+    expect(fetchAccount<DecodedConfig>("Config", configPDA).paused).to.equal(false);
   });
 
   it("revokes an individual wallet and decrements per-agent count", async () => {
-    const aw: any = fetchAccount("AgentWallet", wallet0);
+    const aw = fetchAccount<DecodedAgentWallet>("AgentWallet", wallet0);
     const lk = await lookupPDA(toAddressString(aw.wallet_pubkey) as Address);
     await sendIx(ix("revoke_agent_wallet", {}, [w(configPDA), w(wallet0), w(lk), ws(authority)]), authority);
-    const c: any = fetchAccount("Config", configPDA);
+    const c = fetchAccount<DecodedConfig>("Config", configPDA);
     expect(c.wallets_per_agent[0]).to.equal(0);
     expect(accountExists(wallet0)).to.equal(false);
   });
@@ -461,7 +502,7 @@ describe("nexus_access", () => {
     await sendIx(adminIx("propose_authority", { new_authority: new PublicKey(newAuth.address) }), authority);
     await expectFailure(ix("accept_authority", {}, [w(configPDA), s(stranger)]), stranger, "Unauthorized");
     await sendIx(ix("accept_authority", {}, [w(configPDA), s(newAuth)]), newAuth);
-    const c: any = fetchAccount("Config", configPDA);
+    const c = fetchAccount<DecodedConfig>("Config", configPDA);
     expect(toAddressString(c.authority)).to.equal(newAuth.address);
     expect(c.pending_authority).to.equal(null);
     await expectFailure(adminIx("reset_global_spent", {}, authority), authority, "Unauthorized");

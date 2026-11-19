@@ -8,7 +8,8 @@
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
     "test": "ts-mocha tests/test.ts",
-    "test:litesvm": "ts-mocha tests/test.ts"
+    "test:litesvm": "ts-mocha tests/test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
     "@coral-xyz/anchor": "0.31.1",
