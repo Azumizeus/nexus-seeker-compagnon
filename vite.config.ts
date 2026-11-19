@@ -6,7 +6,8 @@ import { componentTagger } from "./plugins/component-tagger";
 export default defineConfig({
   // Le preview passe par un proxy : le serveur doit écouter sur toutes les interfaces, port 5173 fixe.
   server: {
-    host: "::",
+    // true = toutes les interfaces (IPv4 + IPv6 si dispo). "::" plante si l'IPv6 est absent.
+    host: true,
     port: 5173,
     strictPort: true,
     allowedHosts: true,
