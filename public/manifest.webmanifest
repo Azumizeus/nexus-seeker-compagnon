@@ -1,0 +1,14 @@
+{
+  "name": "Nexus Seeker Compagnon",
+  "short_name": "Nexus",
+  "description": "Compagnon IA pour Solana Seeker : wallet, agents et garde-fous on-chain.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8f3ea",
+  "theme_color": "#f8f3ea",
+  "lang": "fr",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

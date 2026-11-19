@@ -7,6 +7,13 @@ import { PublicKey } from "@solana/web3.js";
  */
 export const NETWORK = "devnet" as const;
 
+export const RPC_ENDPOINT: string =
+  import.meta.env.VITE_SOLANA_RPC_URL ||
+  "https://devnet.helius-rpc.com/?api-key=REDACTED";
+
+/** Genesis hash of Solana devnet — used to detect a wrong network on the RPC. */
+export const DEVNET_GENESIS_HASH = "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG";
+
 export const NEXUS_ACCESS_PROGRAM_ID = new PublicKey(
   "4KYPRuiqqTwSmiG3628UexKce2U93y6cgkAKzDqRAfx7",
 );
@@ -25,7 +32,7 @@ export const GUARDIAN_ADDRESS = new PublicKey(
 );
 
 /** On-chain limits — must mirror the program constants. */
-export const MAX_AGENTS = 7;
+export const ONCHAIN_MAX_AGENTS = 7;
 export const MAX_TOTAL_WALLETS = 20;
 export const MAX_SHARED_WALLETS = 3;
 export const MAX_INDIVIDUAL_WALLET_INDEX = 10;
@@ -56,3 +63,6 @@ export const walletLookupPda = (walletPubkey: PublicKey) =>
 
 export const explorerAddressUrl = (address: string) =>
   `https://explorer.solana.com/address/${address}?cluster=${NETWORK}`;
+
+export const explorerTxUrl = (signature: string) =>
+  `https://explorer.solana.com/tx/${signature}?cluster=${NETWORK}`;
