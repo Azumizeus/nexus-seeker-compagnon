@@ -24,7 +24,8 @@ export function useActivity(limit = 8) {
   const [chain, setChain] = useState<FeedItem[]>([]);
   const [chainError, setChainError] = useState<string | null>(null);
 
-  const loadChain = useCallback(async () => {
+  /** Pure read: recent signatures for the Config and the user's wallet. No state is touched here. */
+  const fetchChain = useCallback(async (): Promise<{ items: FeedItem[] | null; error: string | null }> => {
     try {
       const [programSigs, walletSigs] = await Promise.all([
         connection.getSignaturesForAddress(CONFIG_ADDRESS, { limit: 6 }),
@@ -50,17 +51,27 @@ export function useActivity(limit = 8) {
           origin: "chain" as const,
         })),
       ];
-      setChain(items);
-      setChainError(null);
+      return { items, error: null };
     } catch (error) {
       console.error("[activity] chain fetch failed", error);
-      setChainError("Historique on-chain indisponible pour le moment.");
+      return { items: null, error: "Historique on-chain indisponible pour le moment." };
     }
   }, [connection, publicKey]);
 
+  const applyChain = useCallback((r: Awaited<ReturnType<typeof fetchChain>>) => {
+    if (r.items) setChain(r.items);
+    setChainError(r.error);
+  }, []);
+
   useEffect(() => {
-    void loadChain();
-  }, [loadChain, chainTick]);
+    let alive = true;
+    fetchChain().then((r) => {
+      if (alive) applyChain(r);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [fetchChain, applyChain, chainTick]);
 
   const feed = useMemo(() => {
     const known = new Set(journal.filter((j) => j.signature).map((j) => j.signature));
@@ -80,5 +91,7 @@ export function useActivity(limit = 8) {
       .slice(0, limit);
   }, [journal, chain, limit]);
 
-  return { feed, journal, loading, chainError, reload: loadChain };
+  const reload = useCallback(async () => applyChain(await fetchChain()), [fetchChain, applyChain]);
+
+  return { feed, journal, loading, chainError, reload };
 }
