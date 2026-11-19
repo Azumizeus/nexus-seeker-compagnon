@@ -38,13 +38,25 @@ export default class ErrorBoundary extends Component<{ children: ReactNode }, St
               </pre>
             </details>
           )}
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="min-h-tap self-start rounded-2xl border-2 border-foreground bg-primary px-5 font-semibold text-primary-foreground"
-          >
-            Recharger
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const report = `${error.message}\n\n${error.stack ?? ""}\n\nComposants :${componentStack ?? ""}`;
+                void navigator.clipboard?.writeText(report).catch((e) => console.error("[clipboard]", e));
+              }}
+              className="min-h-tap rounded-2xl border-2 border-foreground bg-surface px-5 font-semibold"
+            >
+              Copier le rapport
+            </button>
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="min-h-tap rounded-2xl border-2 border-foreground bg-primary px-5 font-semibold text-primary-foreground"
+            >
+              Recharger
+            </button>
+          </div>
         </div>
       </div>
     );
