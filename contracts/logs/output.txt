@@ -1,0 +1,29 @@
+
+
+  nexus_access
+    ✔ rejects initialize_config from a non-upgrade-authority
+    ✔ initializes config with defaults
+    ✔ cannot initialize twice
+    ✔ accept_authority fails without pending authority
+    ✔ set_guardian is authority only
+    ✔ validates per-agent limit values
+    ✔ registers an individual agent wallet
+    ✔ rejects duplicate wallet pubkey via lookup
+    ✔ rejects invalid agent id, wallet index, and cap above global
+    ✔ rejects registration by non-authority
+    ✔ enforces per-agent wallet limit
+    ✔ registers a shared wallet and validates mask/index
+    ✔ assign_shared_wallet validates target and mask
+    ✔ sets wallet mode and spend cap
+    ✔ override makes effective mode HumanValidation and release restores it
+    ✔ global take_back_control and release
+    ✔ records spend and enforces wallet cap
+    ✔ enforces global spend cap
+    ✔ resets wallet and global spent
+    ✔ pause blocks registration and spend; revoke still works
+    ✔ revokes an individual wallet and decrements per-agent count
+    ✔ two-step authority transfer
+
+
+  22 passing (179ms)
+

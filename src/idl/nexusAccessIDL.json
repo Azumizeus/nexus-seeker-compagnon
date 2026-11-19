@@ -1,0 +1,2254 @@
+{
+  "address": "4KYPRuiqqTwSmiG3628UexKce2U93y6cgkAKzDqRAfx7",
+  "metadata": {
+    "name": "workspace",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "accept_authority",
+      "discriminator": [
+        107,
+        86,
+        198,
+        91,
+        33,
+        12,
+        107,
+        160
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_authority",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "assign_shared_wallet",
+      "discriminator": [
+        186,
+        114,
+        172,
+        42,
+        9,
+        170,
+        80,
+        212
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agent_wallet",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "agents_mask",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "get_effective_mode",
+      "discriminator": [
+        145,
+        210,
+        112,
+        158,
+        55,
+        168,
+        143,
+        92
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agent_wallet"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize_config",
+      "discriminator": [
+        208,
+        127,
+        21,
+        1,
+        194,
+        190,
+        196,
+        70
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "program",
+          "address": "4KYPRuiqqTwSmiG3628UexKce2U93y6cgkAKzDqRAfx7"
+        },
+        {
+          "name": "program_data",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "program"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                2,
+                168,
+                246,
+                145,
+                78,
+                136,
+                161,
+                176,
+                226,
+                16,
+                21,
+                62,
+                247,
+                99,
+                174,
+                43,
+                0,
+                194,
+                185,
+                61,
+                22,
+                193,
+                36,
+                210,
+                192,
+                83,
+                122,
+                16,
+                4,
+                128,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "guardian",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "pause",
+      "discriminator": [
+        211,
+        22,
+        221,
+        251,
+        74,
+        121,
+        193,
+        47
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "propose_authority",
+      "discriminator": [
+        20,
+        148,
+        236,
+        198,
+        76,
+        119,
+        99,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_authority",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "record_spend",
+      "discriminator": [
+        111,
+        102,
+        17,
+        64,
+        245,
+        202,
+        79,
+        55
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agent_wallet",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "amount_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "register_agent_wallet",
+      "discriminator": [
+        40,
+        57,
+        22,
+        0,
+        76,
+        120,
+        80,
+        243
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agent_wallet",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  97,
+                  103,
+                  101,
+                  110,
+                  116,
+                  95,
+                  119,
+                  97,
+                  108,
+                  108,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "agent_id"
+              },
+              {
+                "kind": "arg",
+                "path": "wallet_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "wallet_lookup",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  119,
+                  97,
+                  108,
+                  108,
+                  101,
+                  116,
+                  95,
+                  108,
+                  111,
+                  111,
+                  107,
+                  117,
+                  112
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "wallet_pubkey"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "agent_id",
+          "type": "u8"
+        },
+        {
+          "name": "wallet_index",
+          "type": "u8"
+        },
+        {
+          "name": "wallet_pubkey",
+          "type": "pubkey"
+        },
+        {
+          "name": "spend_cap_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "register_shared_wallet",
+      "discriminator": [
+        134,
+        95,
+        172,
+        1,
+        174,
+        75,
+        9,
+        56
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agent_wallet",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  104,
+                  97,
+                  114,
+                  101,
+                  100,
+                  95,
+                  119,
+                  97,
+                  108,
+                  108,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "wallet_index"
+              }
+            ]
+          }
+        },
+        {
+          "name": "wallet_lookup",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  119,
+                  97,
+                  108,
+                  108,
+                  101,
+                  116,
+                  95,
+                  108,
+                  111,
+                  111,
+                  107,
+                  117,
+                  112
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "wallet_pubkey"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "wallet_index",
+          "type": "u8"
+        },
+        {
+          "name": "wallet_pubkey",
+          "type": "pubkey"
+        },
+        {
+          "name": "assigned_agents_mask",
+          "type": "u8"
+        },
+        {
+          "name": "spend_cap_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "release_control",
+      "discriminator": [
+        189,
+        30,
+        79,
+        187,
+        69,
+        119,
+        159,
+        181
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "release_control_for_agent",
+      "discriminator": [
+        247,
+        108,
+        122,
+        136,
+        221,
+        28,
+        48,
+        30
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "agent_id",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "reset_global_spent",
+      "discriminator": [
+        165,
+        17,
+        255,
+        107,
+        254,
+        41,
+        129,
+        151
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "reset_wallet_spent",
+      "discriminator": [
+        17,
+        44,
+        34,
+        106,
+        30,
+        11,
+        37,
+        100
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agent_wallet",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "revoke_agent_wallet",
+      "discriminator": [
+        255,
+        37,
+        204,
+        31,
+        104,
+        110,
+        56,
+        90
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agent_wallet",
+          "writable": true
+        },
+        {
+          "name": "wallet_lookup",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  119,
+                  97,
+                  108,
+                  108,
+                  101,
+                  116,
+                  95,
+                  108,
+                  111,
+                  111,
+                  107,
+                  117,
+                  112
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "agent_wallet.wallet_pubkey",
+                "account": "AgentWallet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "set_global_spend_cap",
+      "discriminator": [
+        128,
+        179,
+        132,
+        74,
+        47,
+        138,
+        142,
+        188
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_cap_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "set_guardian",
+      "discriminator": [
+        147,
+        243,
+        50,
+        121,
+        154,
+        164,
+        50,
+        30
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_guardian",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "set_max_wallets_per_agent",
+      "discriminator": [
+        116,
+        195,
+        38,
+        50,
+        104,
+        179,
+        124,
+        138
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "n",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "set_wallet_mode",
+      "discriminator": [
+        4,
+        208,
+        67,
+        143,
+        51,
+        72,
+        89,
+        105
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agent_wallet",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "mode",
+          "type": {
+            "defined": {
+              "name": "WalletMode"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "set_wallet_spend_cap",
+      "discriminator": [
+        228,
+        173,
+        108,
+        198,
+        119,
+        126,
+        225,
+        68
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "agent_wallet",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": [
+        {
+          "name": "new_cap_lamports",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "take_back_control",
+      "discriminator": [
+        206,
+        10,
+        59,
+        68,
+        217,
+        165,
+        76,
+        251
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "signer": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "take_back_control_for_agent",
+      "discriminator": [
+        52,
+        104,
+        66,
+        226,
+        109,
+        97,
+        11,
+        229
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "agent_id",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "unpause",
+      "discriminator": [
+        169,
+        144,
+        4,
+        38,
+        10,
+        141,
+        188,
+        255
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.seed_authority",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "AgentWallet",
+      "discriminator": [
+        127,
+        35,
+        180,
+        143,
+        201,
+        1,
+        100,
+        50
+      ]
+    },
+    {
+      "name": "Config",
+      "discriminator": [
+        155,
+        12,
+        170,
+        224,
+        30,
+        250,
+        204,
+        130
+      ]
+    },
+    {
+      "name": "WalletLookup",
+      "discriminator": [
+        40,
+        86,
+        160,
+        5,
+        120,
+        182,
+        237,
+        254
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "AgentWalletRegistered",
+      "discriminator": [
+        173,
+        83,
+        113,
+        50,
+        99,
+        167,
+        253,
+        203
+      ]
+    },
+    {
+      "name": "AgentWalletRevoked",
+      "discriminator": [
+        205,
+        209,
+        138,
+        224,
+        113,
+        238,
+        233,
+        67
+      ]
+    },
+    {
+      "name": "AuthorityAccepted",
+      "discriminator": [
+        166,
+        192,
+        219,
+        188,
+        41,
+        209,
+        195,
+        26
+      ]
+    },
+    {
+      "name": "AuthorityProposed",
+      "discriminator": [
+        244,
+        117,
+        94,
+        112,
+        53,
+        151,
+        35,
+        89
+      ]
+    },
+    {
+      "name": "ConfigInitialized",
+      "discriminator": [
+        181,
+        49,
+        200,
+        156,
+        19,
+        167,
+        178,
+        91
+      ]
+    },
+    {
+      "name": "ControlReleased",
+      "discriminator": [
+        15,
+        144,
+        205,
+        132,
+        75,
+        191,
+        211,
+        132
+      ]
+    },
+    {
+      "name": "ControlTakenBack",
+      "discriminator": [
+        151,
+        233,
+        71,
+        127,
+        187,
+        209,
+        132,
+        159
+      ]
+    },
+    {
+      "name": "EffectiveMode",
+      "discriminator": [
+        2,
+        101,
+        132,
+        74,
+        63,
+        28,
+        181,
+        29
+      ]
+    },
+    {
+      "name": "GlobalSpendCapUpdated",
+      "discriminator": [
+        20,
+        5,
+        151,
+        97,
+        222,
+        8,
+        191,
+        95
+      ]
+    },
+    {
+      "name": "GlobalSpentReset",
+      "discriminator": [
+        121,
+        12,
+        68,
+        23,
+        9,
+        241,
+        13,
+        81
+      ]
+    },
+    {
+      "name": "GuardianUpdated",
+      "discriminator": [
+        31,
+        95,
+        81,
+        24,
+        90,
+        9,
+        246,
+        32
+      ]
+    },
+    {
+      "name": "Paused",
+      "discriminator": [
+        172,
+        248,
+        5,
+        253,
+        49,
+        255,
+        255,
+        232
+      ]
+    },
+    {
+      "name": "PerAgentLimitUpdated",
+      "discriminator": [
+        25,
+        130,
+        145,
+        25,
+        63,
+        141,
+        146,
+        241
+      ]
+    },
+    {
+      "name": "SharedWalletAssigned",
+      "discriminator": [
+        16,
+        175,
+        172,
+        232,
+        187,
+        27,
+        222,
+        248
+      ]
+    },
+    {
+      "name": "SpendRecorded",
+      "discriminator": [
+        126,
+        238,
+        76,
+        234,
+        130,
+        230,
+        173,
+        166
+      ]
+    },
+    {
+      "name": "Unpaused",
+      "discriminator": [
+        156,
+        150,
+        47,
+        174,
+        120,
+        216,
+        93,
+        117
+      ]
+    },
+    {
+      "name": "WalletModeUpdated",
+      "discriminator": [
+        149,
+        160,
+        178,
+        252,
+        70,
+        182,
+        251,
+        119
+      ]
+    },
+    {
+      "name": "WalletSpendCapUpdated",
+      "discriminator": [
+        137,
+        126,
+        155,
+        187,
+        219,
+        140,
+        215,
+        163
+      ]
+    },
+    {
+      "name": "WalletSpentReset",
+      "discriminator": [
+        209,
+        3,
+        8,
+        137,
+        178,
+        115,
+        250,
+        215
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized access"
+    },
+    {
+      "code": 6001,
+      "name": "Paused",
+      "msg": "Program is paused"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidAgentId",
+      "msg": "Invalid agent id"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidWalletIndex",
+      "msg": "Invalid wallet index"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidAgentMask",
+      "msg": "Invalid agent mask"
+    },
+    {
+      "code": 6005,
+      "name": "TotalWalletLimit",
+      "msg": "Total wallet limit reached"
+    },
+    {
+      "code": 6006,
+      "name": "AgentWalletLimit",
+      "msg": "Per-agent wallet limit reached"
+    },
+    {
+      "code": 6007,
+      "name": "SharedWalletLimit",
+      "msg": "Shared wallet limit reached"
+    },
+    {
+      "code": 6008,
+      "name": "InvalidPerAgentLimit",
+      "msg": "Invalid per-agent limit; allowed values are 1, 2, 5, 10"
+    },
+    {
+      "code": 6009,
+      "name": "NotSharedWallet",
+      "msg": "Wallet is not a shared wallet"
+    },
+    {
+      "code": 6010,
+      "name": "NoPendingAuthority",
+      "msg": "No pending authority"
+    },
+    {
+      "code": 6011,
+      "name": "SpendCapExceedsGlobal",
+      "msg": "Spend cap exceeds global spend cap"
+    },
+    {
+      "code": 6012,
+      "name": "WalletSpendCapExceeded",
+      "msg": "Wallet spend cap exceeded"
+    },
+    {
+      "code": 6013,
+      "name": "GlobalSpendCapExceeded",
+      "msg": "Global spend cap exceeded"
+    },
+    {
+      "code": 6014,
+      "name": "Overflow",
+      "msg": "Arithmetic overflow"
+    }
+  ],
+  "types": [
+    {
+      "name": "AgentWallet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "agent_id",
+            "type": "u8"
+          },
+          {
+            "name": "wallet_index",
+            "type": "u8"
+          },
+          {
+            "name": "wallet_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_shared",
+            "type": "bool"
+          },
+          {
+            "name": "assigned_agents_mask",
+            "type": "u8"
+          },
+          {
+            "name": "mode",
+            "type": {
+              "defined": {
+                "name": "WalletMode"
+              }
+            }
+          },
+          {
+            "name": "spend_cap_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "spent_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "AgentWalletRegistered",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "agent_id",
+            "type": "u8"
+          },
+          {
+            "name": "wallet_index",
+            "type": "u8"
+          },
+          {
+            "name": "wallet_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_shared",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AgentWalletRevoked",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "agent_id",
+            "type": "u8"
+          },
+          {
+            "name": "wallet_index",
+            "type": "u8"
+          },
+          {
+            "name": "wallet_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_shared",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuthorityAccepted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "previous",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_authority",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AuthorityProposed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "current",
+            "type": "pubkey"
+          },
+          {
+            "name": "proposed",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Config",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "pending_authority",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "guardian",
+            "type": "pubkey"
+          },
+          {
+            "name": "seed_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "version",
+            "type": "u8"
+          },
+          {
+            "name": "max_wallets_per_agent",
+            "type": "u8"
+          },
+          {
+            "name": "total_wallets",
+            "type": "u8"
+          },
+          {
+            "name": "shared_wallets",
+            "type": "u8"
+          },
+          {
+            "name": "wallets_per_agent",
+            "type": {
+              "array": [
+                "u8",
+                7
+              ]
+            }
+          },
+          {
+            "name": "global_override",
+            "type": "bool"
+          },
+          {
+            "name": "agent_override_mask",
+            "type": "u8"
+          },
+          {
+            "name": "global_spend_cap_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "global_spent_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ConfigInitialized",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "guardian",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ControlReleased",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "agent_id",
+            "type": {
+              "option": "u8"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "ControlTakenBack",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "by",
+            "type": "pubkey"
+          },
+          {
+            "name": "agent_id",
+            "type": {
+              "option": "u8"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "EffectiveMode",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "agent_id",
+            "type": "u8"
+          },
+          {
+            "name": "stored_mode",
+            "type": {
+              "defined": {
+                "name": "WalletMode"
+              }
+            }
+          },
+          {
+            "name": "effective_mode",
+            "type": {
+              "defined": {
+                "name": "WalletMode"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalSpendCapUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "global_spend_cap_lamports",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GlobalSpentReset",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GuardianUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "guardian",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Paused",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PerAgentLimitUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "max_wallets_per_agent",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SharedWalletAssigned",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "agents_mask",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SpendRecorded",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "agent_id",
+            "type": "u8"
+          },
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "wallet_spent_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "global_spent_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "effective_mode",
+            "type": {
+              "defined": {
+                "name": "WalletMode"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Unpaused",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "by",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WalletLookup",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet_pubkey",
+            "type": "pubkey"
+          },
+          {
+            "name": "agent_wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WalletMode",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "HumanValidation"
+          },
+          {
+            "name": "AgentAsks"
+          },
+          {
+            "name": "AgentAuthorized"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WalletModeUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "mode",
+            "type": {
+              "defined": {
+                "name": "WalletMode"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WalletSpendCapUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "spend_cap_lamports",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WalletSpentReset",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wallet",
+            "type": "pubkey"
+          },
+          {
+            "name": "previous_spent_lamports",
+            "type": "u64"
+          },
+          {
+            "name": "global_spent_lamports",
+            "type": "u64"
+          }
+        ]
+      }
+    }
+  ]
+}
