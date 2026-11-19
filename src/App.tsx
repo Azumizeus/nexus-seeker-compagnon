@@ -9,6 +9,7 @@ import HomeScreen from "@/components/screens/HomeScreen";
 import RequestActionScreen from "@/components/screens/RequestActionScreen";
 import AgentsWalletsScreen from "@/components/screens/AgentsWalletsScreen";
 import ChatScreen from "@/components/screens/ChatScreen";
+import PerformanceScreen from "@/components/screens/PerformanceScreen";
 import AdministrationScreen from "@/components/screens/AdministrationScreen";
 import SettingsScreen from "@/components/screens/SettingsScreen";
 
@@ -25,6 +26,7 @@ export default function App() {
                   <Route path="/demander" element={<RequestActionScreen />} />
                   <Route path="/agents" element={<AgentsWalletsScreen />} />
                   <Route path="/chat" element={<ChatScreen />} />
+                  <Route path="/performance" element={<PerformanceScreen />} />
                   <Route path="/admin" element={<AdministrationScreen />} />
                   <Route path="/parametres" element={<SettingsScreen />} />
                   <Route path="*" element={<Navigate to="/" replace />} />

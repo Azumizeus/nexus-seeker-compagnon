@@ -15,20 +15,11 @@ import { WALLET_MODE_HINTS, WALLET_MODE_LABELS, type WalletMode } from "@/lib/gu
 import type { Agent } from "@/lib/models";
 import { explorerTxUrl } from "@/lib/solana";
 import { cn, formatRelative, formatSol } from "@/lib/utils";
-import {
-  balanceDelta,
-  buildBalanceSeries,
-  orderedAccountKeys,
-  resolveAccountIndex,
-  type WalletTxPoint,
-} from "@/lib/walletSeries";
+import { buildBalanceSeries } from "@/lib/walletSeries";
+import { fetchWalletTxs, type WalletTx } from "@/lib/walletChain";
 
 const MODES: WalletMode[] = ["humanValidation", "agentAsks", "agentAuthorized"];
 const TX_LIMIT = 10;
-
-interface WalletTxRow extends WalletTxPoint {
-  failed: boolean;
-}
 
 interface WalletDetailProps {
   wallet: AgentWalletView;
@@ -52,7 +43,7 @@ export default function WalletDetail({ wallet, agents, api, canEdit, open, onOpe
   // The snapshot carries the key it was fetched for, so a wallet switch or a
   // refresh reads as "loading" without setting state inside the effect.
   const requestKey = `${wallet.walletPubkey}:${chainTick}:${reloadKey}`;
-  const [snapshot, setSnapshot] = useState<{ key: string; status: "ready" | "error"; rows: WalletTxRow[] } | null>(null);
+  const [snapshot, setSnapshot] = useState<{ key: string; status: "ready" | "error"; rows: WalletTx[] } | null>(null);
   const fresh = snapshot?.key === requestKey ? snapshot : null;
   const rows = useMemo(() => fresh?.rows ?? [], [fresh]);
   const loading = open && !fresh;
@@ -62,41 +53,7 @@ export default function WalletDetail({ wallet, agents, api, canEdit, open, onOpe
     if (!open) return;
     let alive = true;
 
-    const load = async () => {
-      const signatures = await client.connection.getSignaturesForAddress(new PublicKey(wallet.walletPubkey), {
-        limit: TX_LIMIT,
-      });
-      if (signatures.length === 0) return [];
-      const parsed = await client.connection.getParsedTransactions(
-        signatures.map((s) => s.signature),
-        { commitment: "confirmed", maxSupportedTransactionVersion: 0 },
-      );
-      return signatures.map((info, index) => {
-        const tx = parsed[index];
-        const meta = tx?.meta;
-        const message = tx?.transaction.message;
-        const loaded = meta?.loadedAddresses;
-        const keys = message
-          ? orderedAccountKeys(
-              message.accountKeys.map((key) => key.pubkey.toBase58()),
-              loaded
-                ? {
-                    writable: loaded.writable.map((key) => key.toBase58()),
-                    readonly: loaded.readonly.map((key) => key.toBase58()),
-                  }
-                : null,
-            )
-          : [];
-        const position = resolveAccountIndex(keys, wallet.walletPubkey);
-        const delta = position < 0 ? 0 : balanceDelta(meta?.preBalances[position], meta?.postBalances[position]);
-        return {
-          signature: info.signature,
-          blockTime: info.blockTime ?? null,
-          deltaLamports: delta,
-          failed: Boolean(info.err),
-        } satisfies WalletTxRow;
-      });
-    };
+    const load = () => fetchWalletTxs(client.connection, new PublicKey(wallet.walletPubkey), TX_LIMIT);
 
     load()
       .then((next) => {
