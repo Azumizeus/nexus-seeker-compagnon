@@ -3,6 +3,7 @@ import {
   PUBLIC_DEVNET_RPC,
   createRequestSpacer,
   isRetryableRpcError,
+  resolveRequestSpacing,
   resolveRpcEndpoints,
   toWebsocketUrl,
   withRpcFailover,
@@ -40,6 +41,18 @@ describe("resolveRpcEndpoints", () => {
       }),
     ).toEqual(["https://primary.example/rpc", PUBLIC_DEVNET_RPC]);
     expect(resolveRpcEndpoints({ VITE_SOLANA_RPC_URL: "   " })).toEqual([PUBLIC_DEVNET_RPC]);
+  });
+});
+
+describe("resolveRequestSpacing", () => {
+  it("spaces requests only when the public endpoint is all we have", () => {
+    expect(resolveRequestSpacing([PUBLIC_DEVNET_RPC])).toBe(100);
+    expect(resolveRequestSpacing([PUBLIC_DEVNET_RPC, PUBLIC_DEVNET_RPC])).toBe(100);
+  });
+
+  it("does not space requests when a provider is configured", () => {
+    expect(resolveRequestSpacing(["https://devnet.helius-rpc.com/?api-key=x", PUBLIC_DEVNET_RPC])).toBe(0);
+    expect(resolveRequestSpacing(["https://devnet.helius-rpc.com/?api-key=x"])).toBe(0);
   });
 });
 

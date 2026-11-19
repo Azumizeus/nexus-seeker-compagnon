@@ -35,5 +35,6 @@ jobs:
           cache: npm
           cache-dependency-path: contracts/package-lock.json
       - run: npm ci
-      # The LiteSVM suite needs target/deploy/workspace.so; only types are checked here.
       - run: npm run typecheck
+      # Runs the on-chain suite in LiteSVM against target/deploy/workspace.so.
+      - run: npm test
