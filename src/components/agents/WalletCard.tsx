@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, History, RotateCcw, Trash2 } from "lucide-react";
+import { ChevronDown, History, Info, RotateCcw, Trash2 } from "lucide-react";
 import Button from "@/components/shared/Button";
 import Badge from "@/components/shared/Badge";
 import AddressChip from "@/components/shared/AddressChip";
@@ -7,6 +7,7 @@ import AgentAvatar from "@/components/shared/AgentAvatar";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { GuardNotice } from "@/components/shared/Notices";
 import WalletHistory from "./WalletHistory";
+import WalletDetail from "./WalletDetail";
 import type { useAgentWallets, AgentWalletView } from "@/hooks/useAgentWallets";
 import { useNexus } from "@/hooks/useNexus";
 import { WALLET_MODE_HINTS, WALLET_MODE_LABELS, type WalletMode } from "@/lib/guards";
@@ -32,6 +33,7 @@ export default function WalletCard({ wallet, agents, api, canEdit }: WalletCardP
   const [mask, setMask] = useState(wallet.assignedAgentsMask);
   const [confirm, setConfirm] = useState<Pending>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [showDetail, setShowDetail] = useState(false);
 
   const capSol = Number(cap);
   const globalCapSol = lamportsToSol(config?.globalSpendCapLamports ?? 0);
@@ -188,16 +190,34 @@ export default function WalletCard({ wallet, agents, api, canEdit }: WalletCardP
         </div>
       )}
 
-      <button
-        type="button"
-        onClick={() => setShowHistory((s) => !s)}
-        aria-expanded={showHistory}
-        className="mt-3 flex min-h-tap w-full items-center gap-2 rounded-xl px-2 text-sm font-semibold hover:bg-surface-sunken"
-      >
-        <History className="h-4 w-4" aria-hidden /> Historique
-        <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", showHistory && "rotate-180")} aria-hidden />
-      </button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => setShowDetail(true)}
+          className="flex min-h-tap items-center gap-2 rounded-xl px-2 text-sm font-semibold hover:bg-surface-sunken"
+        >
+          <Info className="h-4 w-4" aria-hidden /> Détails
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowHistory((s) => !s)}
+          aria-expanded={showHistory}
+          className="flex min-h-tap items-center gap-2 rounded-xl px-2 text-sm font-semibold hover:bg-surface-sunken"
+        >
+          <History className="h-4 w-4" aria-hidden /> Historique
+          <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", showHistory && "rotate-180")} aria-hidden />
+        </button>
+      </div>
       {showHistory && <WalletHistory walletPubkey={wallet.walletPubkey} />}
+
+      <WalletDetail
+        wallet={wallet}
+        agents={agents}
+        api={api}
+        canEdit={canEdit}
+        open={showDetail}
+        onOpenChange={setShowDetail}
+      />
 
       <ConfirmDialog
         open={!!confirm}
