@@ -5,7 +5,7 @@ import Button from "@/components/shared/Button";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { GuardNotice } from "@/components/shared/Notices";
 import { useTelegramLink } from "@/hooks/useTelegramLink";
-import { TELEGRAM_BOT_USERNAME } from "@/lib/telegramLink";
+import { TELEGRAM_BOT_USERNAME, TELEGRAM_MOCK_BOT_ENABLED } from "@/lib/telegramLink";
 import { formatRelative } from "@/lib/utils";
 
 const timeOf = (ts: number) => new Date(ts).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
@@ -46,15 +46,23 @@ export default function TelegramConnection() {
       ) : link.status === "pending" ? (
         <div className="stack !gap-3">
           <p className="text-sm">
-            Ouvre <span className="font-semibold">@{TELEGRAM_BOT_USERNAME}</span> dans Telegram et envoie ce code. Il expire à {timeOf(link.expiresAt)}.
+            {TELEGRAM_MOCK_BOT_ENABLED ? (
+              <>
+                Ouvre <span className="font-semibold">@{TELEGRAM_BOT_USERNAME}</span> dans Telegram et envoie ce code. Il expire à {timeOf(link.expiresAt)}.
+              </>
+            ) : (
+              <>Aucun bot n'est encore branché : ce code ne peut pas être validé. Il expire à {timeOf(link.expiresAt)}.</>
+            )}
           </p>
           <p className="self-start rounded-xl bg-surface-sunken px-4 py-2 font-mono text-xl font-bold tracking-[0.2em]" aria-label="Code de liaison">
             {link.code}
           </p>
           <div className="flex flex-wrap gap-2">
-            <Button variant="primary" onClick={tg.simulateConfirm} loading={tg.pending === "confirm"} disabled={tg.pending !== null && tg.pending !== "confirm"}>
-              Simuler la réponse du bot
-            </Button>
+            {TELEGRAM_MOCK_BOT_ENABLED && (
+              <Button variant="primary" onClick={tg.simulateConfirm} loading={tg.pending === "confirm"} disabled={tg.pending !== null && tg.pending !== "confirm"}>
+                Simuler la réponse du bot
+              </Button>
+            )}
             <Button variant="outline" onClick={tg.cancel} loading={tg.pending === "cancel"} disabled={tg.pending !== null && tg.pending !== "cancel"}>
               Annuler
             </Button>
