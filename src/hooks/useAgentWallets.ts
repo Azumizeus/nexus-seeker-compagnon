@@ -25,29 +25,38 @@ export function useAgentWallets() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
+  /** Pure read: registry + balances. No state is touched here. */
+  const fetchSnapshot = useCallback(async () => {
     const result = await client.fetchAgentWallets();
-    if (!result.success) {
-      setError(result.error ?? "Lecture des wallets agent impossible");
-      setLoading(false);
-      return;
-    }
+    if (!result.success) return { error: result.error ?? "Lecture des wallets agent impossible", list: null, balances: null };
     const list = result.data ?? [];
-    setWallets(list);
-    setError(null);
-    setLoading(false);
     const bal = await client.fetchBalances(list.map((w) => w.walletPubkey));
-    if (bal.success && bal.data) setBalances(bal.data);
+    return { error: null, list, balances: bal.success && bal.data ? bal.data : null };
   }, [client]);
+
+  const applySnapshot = useCallback((snap: Awaited<ReturnType<typeof fetchSnapshot>>) => {
+    if (snap.list) setWallets(snap.list);
+    if (snap.balances) setBalances(snap.balances);
+    setError(snap.error);
+    setLoading(false);
+  }, []);
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    await load();
-  }, [load]);
+    applySnapshot(await fetchSnapshot());
+  }, [fetchSnapshot, applySnapshot]);
 
   useEffect(() => {
-    void load();
-  }, [load, chainTick]);
+    let alive = true;
+    fetchSnapshot()
+      .then((snap) => {
+        if (alive) applySnapshot(snap);
+      })
+      .catch((e: unknown) => console.error("[agent wallets]", e));
+    return () => {
+      alive = false;
+    };
+  }, [fetchSnapshot, applySnapshot, chainTick]);
 
   const views = useMemo<AgentWalletView[]>(() => {
     const overrides = { globalOverride: config?.globalOverride ?? false, agentOverrideMask: config?.agentOverrideMask ?? 0 };

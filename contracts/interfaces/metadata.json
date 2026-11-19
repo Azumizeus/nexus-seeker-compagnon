@@ -1,6 +1,9 @@
 {
-  "program_id": "4KYPRuiqqTwSmiG3628UexKce2U93y6cgkAKzDqRAfx7",
+  "program_id": "AnqYwe2voTSYNmaPsmHXpJgY9LboBXCg3orbk7cemfL1",
   "network": "devnet",
-  "signature": "4drpW4mbMcYmzvfaBg5vQY23pr4SbQS4EX4MP9sa5TV26ZNt5GUsrDVuqYyqjq8AtQLMdHfF93hocouMjdyJbD5B",
-  "config_address": "4wExvrq7ERVL3qx4bVeC1PsCLvpAQRkdbpMuKJHUtWQ7"
+  "signature": "59TApTWavLD7BJm33QDpGatv2FefFnEyRccGKkrw5JFNM8Ve5tJ7hVt9XX696u2xft6qJgUqA5k1ynfw6gpZSp9H",
+  "config_address": "5g4u3GdVQ3uypa7ERmo9BUy5mYg8BH5RyBCRx7qgwXZ6",
+  "authority": "9MntUkYSzi1fcZMRvoHV1hVUbrmGF9miDu7zga3zEnG1",
+  "guardian": "8sWbmZg4PqL1Sf2G7fmjGsnjjnrPgW2nB2nCGS6GEXFQ",
+  "initialize_config_signature": "2axj3zujtzQ5bCfuNq8r6kLKQimukeWG1BWqvHWgjb13o8aaovdxinSM4FR3ignDpPpL3NXxFqmVDJ2Q73vU5ZW2J"
 }
