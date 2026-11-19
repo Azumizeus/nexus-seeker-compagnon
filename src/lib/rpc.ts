@@ -119,6 +119,11 @@ export function createRequestSpacer(minIntervalMs: number) {
  * across 1.x): wrapping it keeps every caller — Anchor, hooks, wallet adapter —
  * on the same retry/rotation path without touching each call site.
  */
+/** Same endpoint on the websocket scheme, query string (API key) preserved. */
+export function toWebsocketUrl(endpoint: string): string {
+  return endpoint.replace(/^https:/, "wss:").replace(/^http:/, "ws:");
+}
+
 export interface ResilientConnectionOptions {
   /** Minimum gap between two JSON-RPC calls, in milliseconds. */
   minRequestIntervalMs?: number;
@@ -135,6 +140,9 @@ export function createResilientConnection(
     commitment: "confirmed",
     // Our failover owns retries; web3.js's own loop would only add 4s stalls.
     disableRetryOnRateLimit: true,
+    // web3.js rebuilds the ws:// URL without the query string, which drops the
+    // API key and makes the socket fail auth.
+    wsEndpoint: toWebsocketUrl(list[0]),
     ...config,
   });
 

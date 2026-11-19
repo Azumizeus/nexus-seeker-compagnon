@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import { PUBLIC_DEVNET_RPC, createRequestSpacer, isRetryableRpcError, resolveRpcEndpoints, withRpcFailover } from "./rpc";
+import {
+  PUBLIC_DEVNET_RPC,
+  createRequestSpacer,
+  isRetryableRpcError,
+  resolveRpcEndpoints,
+  toWebsocketUrl,
+  withRpcFailover,
+} from "./rpc";
 
 const rateLimited = (statusCode = 429) => Object.assign(new Error(`Server responded with ${statusCode}`), { statusCode });
 const noSleep = async () => {};
@@ -33,6 +40,13 @@ describe("resolveRpcEndpoints", () => {
       }),
     ).toEqual(["https://primary.example/rpc", PUBLIC_DEVNET_RPC]);
     expect(resolveRpcEndpoints({ VITE_SOLANA_RPC_URL: "   " })).toEqual([PUBLIC_DEVNET_RPC]);
+  });
+});
+
+describe("toWebsocketUrl", () => {
+  it("keeps the query string so the API key survives", () => {
+    expect(toWebsocketUrl("https://devnet.helius-rpc.com/?api-key=abc")).toBe("wss://devnet.helius-rpc.com/?api-key=abc");
+    expect(toWebsocketUrl("http://localhost:8899")).toBe("ws://localhost:8899");
   });
 });
 
