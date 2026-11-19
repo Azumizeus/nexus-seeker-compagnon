@@ -1,4 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
+import { resolveRpcEndpoints } from "./rpc";
 
 /**
  * nexus_access — on-chain registry for agent wallets (devnet only).
@@ -8,12 +9,13 @@ import { PublicKey } from "@solana/web3.js";
 export const NETWORK = "devnet" as const;
 
 /**
- * Endpoint RPC. Aucune clé n'est écrite dans le code : on lit la variable
- * d'environnement et on retombe sur le RPC public devnet sinon.
+ * Endpoint RPC principal. Aucune clé n'est écrite dans le code : on lit la
+ * variable d'environnement et on retombe sur le RPC public devnet sinon.
+ * La connexion résiliente (src/lib/rpc.ts) bascule sur les endpoints suivants
+ * quand celui-ci renvoie 429.
  * Attention : tout ce qui est préfixé VITE_ finit dans le bundle client.
  */
-export const RPC_ENDPOINT: string =
-  import.meta.env.VITE_SOLANA_RPC_URL || "https://api.devnet.solana.com";
+export const RPC_ENDPOINT: string = resolveRpcEndpoints()[0];
 
 /** Genesis hash of Solana devnet — used to detect a wrong network on the RPC. */
 export const DEVNET_GENESIS_HASH = "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG";
