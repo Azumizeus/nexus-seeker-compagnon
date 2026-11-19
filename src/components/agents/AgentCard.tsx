@@ -5,6 +5,7 @@ import Badge from "@/components/shared/Badge";
 import AgentAvatar from "@/components/shared/AgentAvatar";
 import TakeControlButton from "@/components/shared/TakeControlButton";
 import WalletCard from "./WalletCard";
+import AgentTradingKeys from "./AgentTradingKeys";
 import type { useAgentWallets } from "@/hooks/useAgentWallets";
 import { useAgentMemory } from "@/hooks/useAgentMemory";
 import { useAgentSandbox } from "@/hooks/useAgentSandbox";
@@ -114,6 +115,8 @@ export default function AgentCard({ agent, agents, api, canEdit, onEdit, onDelet
           </p>
         )}
       </div>
+
+      <AgentTradingKeys agent={agent} canEdit={canEdit} />
     </article>
   );
 }
