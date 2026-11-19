@@ -1,6 +1,7 @@
 import { ExternalLink, Lock, Moon, Sun } from "lucide-react";
 import Badge from "@/components/shared/Badge";
 import LimitsForm from "@/components/admin/LimitsForm";
+import TelegramConnection from "@/components/settings/TelegramConnection";
 import { SectionTitle } from "@/components/shared/Notices";
 import { useTheme } from "@/hooks/useTheme";
 import { useSupportedWallets } from "@/hooks/useSupportedWallets";
@@ -58,6 +59,11 @@ export default function SettingsScreen() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="card stack">
+        <SectionTitle title="Connexions" />
+        <TelegramConnection />
       </section>
 
       <section className="card stack">
