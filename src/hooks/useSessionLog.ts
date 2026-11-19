@@ -25,11 +25,17 @@ export function useSessionRecorder(address: string | null, walletName: string | 
       return null;
     });
     const beat = setInterval(() => {
-      void idPromise.then((id) => id && recordSeen(id).catch((e: unknown) => console.error("[sessions]", e)));
+      void idPromise.then((id) => {
+        if (!id) return;
+        return recordSeen(id).catch((e: unknown) => console.error("[sessions]", e));
+      });
     }, SESSION_HEARTBEAT_MS);
     return () => {
       clearInterval(beat);
-      void idPromise.then((id) => id && recordDisconnect(id).catch((e: unknown) => console.error("[sessions]", e)));
+      void idPromise.then((id) => {
+        if (!id) return;
+        return recordDisconnect(id).catch((e: unknown) => console.error("[sessions]", e));
+      });
     };
   }, [address, walletName]);
 }
