@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/workspace.json`.
  */
 export type Workspace = {
-  "address": "4KYPRuiqqTwSmiG3628UexKce2U93y6cgkAKzDqRAfx7",
+  "address": "AnqYwe2voTSYNmaPsmHXpJgY9LboBXCg3orbk7cemfL1",
   "metadata": {
     "name": "workspace",
     "version": "0.1.0",
@@ -198,7 +198,7 @@ export type Workspace = {
         },
         {
           "name": "program",
-          "address": "4KYPRuiqqTwSmiG3628UexKce2U93y6cgkAKzDqRAfx7"
+          "address": "AnqYwe2voTSYNmaPsmHXpJgY9LboBXCg3orbk7cemfL1"
         },
         {
           "name": "programData",

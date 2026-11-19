@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_lang::solana_program::bpf_loader_upgradeable;
 
-declare_id!("94kcYQ2jdaGWGTwd6tYwnTQspA1Nn7K7NbPFb36hBcbo");
+declare_id!("AnqYwe2voTSYNmaPsmHXpJgY9LboBXCg3orbk7cemfL1");
 
 pub const MAX_AGENTS: u8 = 7;
 pub const MAX_TOTAL_WALLETS: u8 = 20;
