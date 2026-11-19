@@ -15,7 +15,7 @@ export const RPC_ENDPOINT: string =
 export const DEVNET_GENESIS_HASH = "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG";
 
 export const NEXUS_ACCESS_PROGRAM_ID = new PublicKey(
-  "4KYPRuiqqTwSmiG3628UexKce2U93y6cgkAKzDqRAfx7",
+  "AnqYwe2voTSYNmaPsmHXpJgY9LboBXCg3orbk7cemfL1",
 );
 
 /**
@@ -23,7 +23,7 @@ export const NEXUS_ACCESS_PROGRAM_ID = new PublicKey(
  * original initializer, so the address stays stable after authority transfers.
  */
 export const CONFIG_ADDRESS = new PublicKey(
-  "4wExvrq7ERVL3qx4bVeC1PsCLvpAQRkdbpMuKJHUtWQ7",
+  "5g4u3GdVQ3uypa7ERmo9BUy5mYg8BH5RyBCRx7qgwXZ6",
 );
 export const configAddress = CONFIG_ADDRESS;
 
