@@ -6,6 +6,22 @@ on:
   pull_request:
 
 jobs:
+  hygiene:
+    name: Repository hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      # node_modules came back three times through merge resolutions; the
+      # branch is 1.7 MB with it ignored and ~180 MB with it tracked.
+      - name: node_modules must not be committed
+        run: |
+          tracked=$(git ls-files node_modules | head -n 5)
+          if [ -n "$tracked" ]; then
+            echo "::error::node_modules is tracked by git. Run 'git rm -r --cached node_modules'."
+            echo "$tracked"
+            exit 1
+          fi
+
   web:
     name: Web app
     runs-on: ubuntu-latest
