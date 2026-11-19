@@ -14,6 +14,9 @@ import { uid } from "./utils";
 export const TELEGRAM_BOT_USERNAME = "NexusSeekerBot";
 export const TELEGRAM_LINK_CODE_TTL_MS = 10 * 60 * 1000;
 
+/** The fake "bot confirm" shortcut only exists in development (and tests), never in a production build. */
+export const TELEGRAM_MOCK_BOT_ENABLED: boolean = import.meta.env.DEV;
+
 /**
  * The mock bot exists only in development builds. A production build never simulates a
  * link, so nothing can look connected without a real server behind it.
@@ -81,6 +84,7 @@ function createMockServer(): TelegramLinkServer {
     async simulateBotConfirm(owner) {
       if (!TELEGRAM_MOCK_BOT_ENABLED) throw new Error("Aucun bot n'est branché : la simulation est désactivée hors développement.");
       await tick();
+      if (!TELEGRAM_MOCK_BOT_ENABLED) throw new Error("Simulation du bot désactivée en production.");
       const current = get(owner);
       if (current.status !== "pending") throw new Error("Aucune liaison en attente.");
       if (Date.now() > current.expiresAt) {
