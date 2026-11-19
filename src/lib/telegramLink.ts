@@ -15,10 +15,10 @@ export const TELEGRAM_BOT_USERNAME = "NexusSeekerBot";
 export const TELEGRAM_LINK_CODE_TTL_MS = 10 * 60 * 1000;
 
 /**
- * The mock bot exists only in development builds (and tests). A production build never
- * simulates a link, so nothing can look connected without a real server behind it.
+ * The mock bot exists only in development builds. A production build never simulates a
+ * link, so nothing can look connected without a real server behind it.
  */
-export const TELEGRAM_MOCK_BOT_ENABLED: boolean = import.meta.env.DEV;
+export const TELEGRAM_MOCK_BOT_ENABLED = import.meta.env.DEV;
 
 export type TelegramLink =
   | { status: "disconnected" }

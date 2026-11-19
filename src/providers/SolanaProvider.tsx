@@ -1,15 +1,13 @@
-import { useCallback, type ReactNode } from "react";
-import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
+import { useCallback, useMemo, type ReactNode } from "react";
+import { ConnectionContext, WalletProvider } from "@solana/wallet-adapter-react";
 import type { Adapter, WalletError } from "@solana/wallet-adapter-base";
 import type { ConnectionConfig } from "@solana/web3.js";
-import { RPC_ENDPOINT } from "@/lib/solana";
+import { createResilientConnection } from "@/lib/rpc";
 
 /**
- * Module-level constants on purpose: ConnectionProvider rebuilds its Connection
- * whenever `config` changes identity, and WalletProvider re-wraps every adapter
- * whenever `wallets` changes identity. Inline `{...}` / `[]` literals create a
- * new identity on every render, which cascades into a new Connection, a new
- * program client and a re-render storm in every consumer.
+ * Module-level constants on purpose: a new `config` identity would rebuild the
+ * Connection and cascade into a new program client and a re-render storm in
+ * every consumer. Same for `wallets`.
  */
 const CONNECTION_CONFIG: ConnectionConfig = { commitment: "confirmed" };
 
@@ -25,11 +23,15 @@ export default function SolanaProvider({ children }: { children: ReactNode }) {
     console.error("[wallet]", error);
   }, []);
 
+  // One Connection for the whole app: reads retry and rotate endpoints on 429.
+  const connection = useMemo(() => createResilientConnection(undefined, CONNECTION_CONFIG), []);
+  const contextValue = useMemo(() => ({ connection }), [connection]);
+
   return (
-    <ConnectionProvider endpoint={RPC_ENDPOINT} config={CONNECTION_CONFIG}>
+    <ConnectionContext.Provider value={contextValue}>
       <WalletProvider wallets={WALLETS} autoConnect onError={onError}>
         {children}
       </WalletProvider>
-    </ConnectionProvider>
+    </ConnectionContext.Provider>
   );
 }
