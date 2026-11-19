@@ -1,0 +1,20 @@
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+import { componentTagger } from "./plugins/component-tagger";
+
+export default defineConfig({
+  plugins: [react(), componentTagger()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  define: {
+    "process.env": {},
+    global: "globalThis",
+  },
+  optimizeDeps: {
+    include: ["buffer"],
+  },
+});
