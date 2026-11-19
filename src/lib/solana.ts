@@ -7,9 +7,13 @@ import { PublicKey } from "@solana/web3.js";
  */
 export const NETWORK = "devnet" as const;
 
+/**
+ * Endpoint RPC. Aucune clé n'est écrite dans le code : on lit la variable
+ * d'environnement et on retombe sur le RPC public devnet sinon.
+ * Attention : tout ce qui est préfixé VITE_ finit dans le bundle client.
+ */
 export const RPC_ENDPOINT: string =
-  import.meta.env.VITE_SOLANA_RPC_URL ||
-  "https://devnet.helius-rpc.com/?api-key=dd39f964-79fe-4373-a22b-7cac000f163b";
+  import.meta.env.VITE_SOLANA_RPC_URL || "https://api.devnet.solana.com";
 
 /** Genesis hash of Solana devnet — used to detect a wrong network on the RPC. */
 export const DEVNET_GENESIS_HASH = "EtWTRABZaYq6iMfeYKouRu166VU2xqa1wcaWoxPkrZBG";

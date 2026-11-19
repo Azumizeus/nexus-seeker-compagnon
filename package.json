@@ -1,4 +1,14 @@
 {
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.app.json --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.app.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "dependencies": {
     "@coral-xyz/anchor": "0.31.1",
     "@eslint/js": "^10.0.1",

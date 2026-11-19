@@ -1,4 +1,4 @@
-import { useCallback, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useToast } from "./useToast";
 import { DISCONNECTED, telegramLinkServer, type TelegramLink } from "@/lib/telegramLink";
@@ -18,15 +18,27 @@ export function useTelegramLink() {
   const links = useSyncExternalStore(telegramLinkServer.subscribe, telegramLinkServer.getSnapshot);
   const link: TelegramLink = owner ? (links.get(owner) ?? DISCONNECTED) : DISCONNECTED;
 
+  // Le wallet peut changer pendant un appel : on ne rattache jamais la liaison
+  // à l'ancien wallet (rien ne doit survivre à un changement de compte).
+  const ownerRef = useRef(owner);
+  useEffect(() => {
+    ownerRef.current = owner;
+  }, [owner]);
+
   const run = useCallback(
     async (action: PendingAction, success: string | null, fn: (owner: string) => Promise<unknown>) => {
       if (!owner) {
         toast({ tone: "alert", title: "Wallet non connecté", description: "Connecte ton wallet pour lier Telegram." });
         return false;
       }
+      const actingFor = owner;
       setPending(action);
       try {
-        await fn(owner);
+        await fn(actingFor);
+        if (ownerRef.current !== actingFor) {
+          await telegramLinkServer.disconnect(actingFor).catch(() => {});
+          return false;
+        }
         if (success) toast({ tone: "success", title: success });
         return true;
       } catch (e) {
