@@ -5,3 +5,10 @@ dist-ssr
 .env
 .vite
 .DS_Store
+
+# SECRETS — Solana keypairs must never be committed
+contracts/target/deploy/*-keypair.json
+contracts/target/wallet/*.json
+contracts/**/id.json
+**/*-keypair.json
+*.keypair.json

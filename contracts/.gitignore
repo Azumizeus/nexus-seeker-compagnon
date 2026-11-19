@@ -15,3 +15,14 @@ target/.rustc_info.json
 
 # OS files
 .DS_Store
+
+# SECRETS — keypairs must never be committed
+# Patterns below are relative to this contracts/ directory
+target/deploy/*-keypair.json
+target/wallet/*.json
+**/id.json
+*.keypair.json
+**/*-keypair.json
+# As requested (only match if a nested contracts/ folder exists; kept for explicitness)
+contracts/target/deploy/*-keypair.json
+contracts/target/wallet/*.json
