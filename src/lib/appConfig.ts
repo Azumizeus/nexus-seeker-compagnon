@@ -9,4 +9,4 @@ export const MAX_AGENTS = Math.min(7, ONCHAIN_MAX_AGENTS);
 
 export const APP_NAME = "Nexus Seeker Compagnon";
 export const APP_VERSION = "0.1.0-devnet";
-export const GITHUB_URL = "https://github.com/Azumizeus/noah-6afe87730f0fdce9c2aada85-1hv1";
+export const GITHUB_URL = "https://github.com/Azumizeus/nexus-seeker-compagnon";
