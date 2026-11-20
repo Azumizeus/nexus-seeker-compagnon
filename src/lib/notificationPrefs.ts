@@ -140,7 +140,8 @@ export function requestSystemPermission(): Promise<SystemPermission> {
 /** Shows a browser notification, only when the tab is hidden (the toast covers the visible case). Never throws. */
 export function notifySystem(title: string, body?: string) {
   if (systemPermission() !== "granted" || typeof document === "undefined" || !document.hidden) return;
-  const options: NotificationOptions = { body, icon: "/icon.svg", tag: `nexus-${title}` };
+  // Android rejects a vector icon on a notification: it needs a raster.
+  const options: NotificationOptions = { body, icon: "/icon-192.png", badge: "/icon-192.png", tag: `nexus-${title}` };
   if (needsServiceWorker()) {
     void navigator.serviceWorker.ready
       .then((registration) => registration.showNotification(title, options))
