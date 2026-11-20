@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Maskable source: full-bleed background, artwork scaled to 82% so the
+       whole eye stays inside Android's central safe zone (80% diameter). -->
+  <rect width="64" height="64" fill="#f8f3ea"/>
+  <g transform="translate(32 32) scale(0.82) translate(-32 -32)">
+    <path d="M6 32 C16 16 48 16 58 32 C48 48 16 48 6 32 Z" fill="#fffdf8" stroke="#2a1f17" stroke-width="3.5" stroke-linejoin="round"/>
+    <circle cx="32" cy="32" r="12" fill="#14F195" stroke="#2a1f17" stroke-width="3"/>
+    <circle cx="32" cy="32" r="17" fill="none" stroke="#9945FF" stroke-width="2" stroke-dasharray="3 4"/>
+    <circle cx="32" cy="29" r="4" fill="#2a1f17"/>
+    <path d="M32 32 V40 M32 37 H35" stroke="#2a1f17" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="46" cy="20" r="3" fill="#f2792b"/>
+  </g>
+</svg>
